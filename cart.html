@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart — Sri Bhaskar Nursery</title>
+
+    <meta name="description" content="Review your selected plants before checkout. Sri Bhaskar Nursery cart.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://sribhaskarnursery.vercel.app/cart.html">
+    <link rel="icon" type="image/jpg" href="logo.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f1f3f6; }
+
+        /* ---- Page Header ---- */
+        .cart-header {
+            background: linear-gradient(135deg, #0B5D3B, #3FA34D);
+            color: #fff;
+            padding: 100px 20px 40px;
+            text-align: center;
+        }
+        .cart-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 8px; }
+        .cart-header p { opacity: 0.85; font-size: 1rem; }
+
+        /* ---- Layout ---- */
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 30px auto 60px;
+            padding: 0 20px;
+        }
+
+        /* ---- Cart Items Panel ---- */
+        .cart-panel {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        }
+        .cart-panel-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cart-panel-header h2 { font-size: 1.1rem; color: #0B5D3B; }
+        #clear-cart-btn {
+            background: none; border: none; color: #e53935;
+            font-size: 0.85rem; cursor: pointer; font-weight: 600;
+        }
+        #clear-cart-btn:hover { text-decoration: underline; }
+
+        .cart-items { padding: 10px 0; }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.2s;
+        }
+        .cart-item:hover { background: #fafafa; }
+        .cart-item-img {
+            width: 80px; height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-weight: 700; font-size: 1rem; color: #222; margin-bottom: 4px; }
+        .cart-item-price { color: #0B5D3B; font-weight: 700; font-size: 1.05rem; }
+        .cart-item-badge { font-size: 0.72rem; background: #e8f5e9; color: #0B5D3B; padding: 2px 8px; border-radius: 20px; font-weight: 600; margin-left: 8px; }
+
+        .cart-item-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .qty-btn {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid #0B5D3B; background: #fff;
+            color: #0B5D3B; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .qty-btn:hover { background: #0B5D3B; color: #fff; }
+        .qty-num { font-weight: 700; font-size: 1rem; min-width: 25px; text-align: center; }
+        .remove-btn {
+            margin-left: auto; background: none; border: none;
+            color: #999; cursor: pointer; font-size: 1.2rem; transition: color 0.2s;
+        }
+        .remove-btn:hover { color: #e53935; }
+
+        /* Empty Cart */
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        .empty-cart i { font-size: 4rem; margin-bottom: 20px; color: #ddd; }
+        .empty-cart h3 { font-size: 1.3rem; color: #555; margin-bottom: 10px; }
+        .empty-cart p { font-size: 0.95rem; margin-bottom: 24px; }
+        .empty-cart .btn-primary { display: inline-flex; padding: 12px 30px; }
+
+        /* ---- Order Summary ---- */
+        .order-summary {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            padding: 24px;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+        .order-summary h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: #444;
+        }
+        .summary-row.total {
+            border-top: 2px dashed #eee;
+            padding-top: 14px;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0B5D3B;
+        }
+        .summary-row .discount { color: #3FA34D; font-weight: 600; }
+        .checkout-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #3FA34D, #0B5D3B);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .checkout-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11,93,59,0.3); }
+        .safe-checkout { text-align: center; margin-top: 14px; font-size: 0.78rem; color: #aaa; }
+        .safe-checkout i { color: #3FA34D; margin-right: 5px; }
+
+        @media (max-width: 768px) {
+            .cart-layout { grid-template-columns: 1fr; }
+            .order-summary { position: static; }
+            .cart-item { padding: 14px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="top-bar">
+    <div class="top-bar-inner">
+        <div class="top-bar-info">
+            <span><i class="fas fa-phone"></i> +91 98855 33297</span>
+            <span><i class="fas fa-map-marker-alt"></i> Kadiyam, Andhra Pradesh</span>
+        </div>
+        <div class="top-bar-social">
+            <a href="https://www.facebook.com/sribhaskarnursery" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/sri_bhaskar_nursery_kadiyam" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/919885533297" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </div>
+</div>
+<nav id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">
+            <img src="logo.jpg" alt="Sri Bhaskar Nursery Logo">
+            <div class="logo-text">
+                <span>Sri Bhaskar</span>
+                <span>Nursery</span>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fruit.html">Fruit Plants</a></li>
+            <li><a href="indoor.html">Indoor Plants</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i> My Orders</a></li>
+        </ul>
+        <div style="display:flex;align-items:center;gap:15px;">
+            <a href="cart.html" style="position:relative;font-size:1.5rem;color:var(--primary);">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" style="position:absolute;top:-8px;right:-8px;background:#e53935;color:#fff;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">0</span>
+            </a>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<div class="cart-header">
+    <h1><i class="fas fa-shopping-cart"></i> My Cart</h1>
+    <p>Review your selected plants before checkout</p>
+</div>
+
+<!-- Cart Layout -->
+<div class="cart-layout">
+    <!-- Items Panel -->
+    <div class="cart-panel">
+        <div class="cart-panel-header">
+            <h2 id="cart-count-label">Cart Items</h2>
+            <button id="clear-cart-btn" onclick="clearAll()"><i class="fas fa-trash"></i> Clear All</button>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="order-summary">
+        <h3>Price Details</h3>
+        <div class="summary-row"><span id="summary-count">Items (0)</span><span id="summary-subtotal">₹0</span></div>
+        <div class="summary-row"><span>Delivery Charges</span><span class="discount" id="delivery-charge">FREE</span></div>
+        
+        <!-- Amazon Coupon Panel -->
+        <div style="border-top:1.5px dashed #eee; border-bottom:1.5px dashed #eee; padding:15px 0; margin:15px 0;">
+            <div style="font-size:0.8rem; font-weight:700; color:#555; margin-bottom:8px;"><i class="fas fa-percentage" style="color:var(--amz-orange);"></i> Apply Promocode</div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="coupon-field" placeholder="e.g. AMAZONPLANT" style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem; outline:none; text-transform:uppercase;">
+                <button onclick="applyPromoCode()" style="background:#e3e6e6; border:1px solid #c8cbcc; padding:0 12px; font-size:0.8rem; font-weight:600; border-radius:4px; cursor:pointer;">Apply</button>
+            </div>
+            <div id="coupon-message" style="font-size:0.75rem; margin-top:6px; font-weight:600;"></div>
+        </div>
+
+        <div class="summary-row" id="discount-row" style="display:none; color:#b12704; font-weight:600;">
+            <span>Promo Discount</span><span id="summary-discount">-₹0</span>
+        </div>
+        
+        <div class="summary-row total"><span>Total Amount</span><span id="summary-total">₹0</span></div>
+        <a href="checkout.html" class="checkout-btn" id="checkout-btn">
+            <i class="fas fa-lock"></i> Proceed to Checkout
+        </a>
+        <div class="safe-checkout"><i class="fas fa-shield-alt"></i> Safe & Secure Checkout</div>
+    </div>
+</div>
+
+<!-- Floating Buttons -->
+<div class="floating-btns">
+    <a href="https://wa.me/919885533297" class="float-btn btn-whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+</div>
+
+<script src="cart.js"></script>
+<script src="amazon-store.js"></script>
+<script>
+// Apply Coupon Promo Code
+function applyPromoCode() {
+    const code = document.getElementById("coupon-field").value.trim().toUpperCase();
+    const msg = document.getElementById("coupon-message");
+    
+    if (!code) {
+        msg.textContent = "Please enter a coupon code.";
+        msg.style.color = "#e53935";
+        return;
+    }
+    
+    // Check in the COUPONS database (defined in amazon-store.js)
+    const discountVal = COUPONS[code];
+    
+    if (discountVal !== undefined) {
+        localStorage.setItem("sb_active_discount_pct", discountVal);
+        localStorage.setItem("sb_active_coupon_code", code);
+        msg.textContent = `Success! "${code}" (${discountVal * 100}% Off) applied.`;
+        msg.style.color = "#007600";
+        renderCart();
+    } else {
+        msg.textContent = "Invalid coupon code. Try 'AMAZONPLANT' or 'BHASKAR20'!";
+        msg.style.color = "#e53935";
+    }
+}
+
+function renderCart() {
+    const cart = Cart.getCart();
+    const container = document.getElementById('cart-items-container');
+    const label = document.getElementById('cart-count-label');
+    const total = Cart.getTotal();
+    const count = Cart.getCount();
+    const delivery = total > 499 ? 0 : 49;
+    
+    // Load promo discounts from localstorage
+    const discountPct = parseFloat(localStorage.getItem("sb_active_discount_pct") || "0");
+    const activeCoupon = localStorage.getItem("sb_active_coupon_code") || "";
+    
+    const discountAmt = Math.round(total * discountPct);
+    const finalTotal = Math.max(0, total - discountAmt + delivery);
+
+    label.textContent = `Cart Items (${cart.length})`;
+    document.getElementById('summary-count').textContent = `Items (${count})`;
+    document.getElementById('summary-subtotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+    document.getElementById('delivery-charge').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
+    
+    const discRow = document.getElementById("discount-row");
+    if (discountPct > 0) {
+        discRow.style.display = "flex";
+        document.getElementById("summary-discount").textContent = `-₹${discountAmt.toLocaleString('en-IN')}`;
+        document.getElementById("coupon-field").value = activeCoupon;
+        const msg = document.getElementById("coupon-message");
+        msg.textContent = `Promo code "${activeCoupon}" applied!`;
+        msg.style.color = "#007600";
+    } else {
+        discRow.style.display = "none";
+    }
+    
+    document.getElementById('summary-total').textContent = `₹${finalTotal.toLocaleString('en-IN')}`;
+
+    if (cart.length === 0) {
+        document.getElementById('checkout-btn').style.pointerEvents = 'none';
+        document.getElementById('checkout-btn').style.opacity = '0.5';
+        container.innerHTML = `
+            <div class="empty-cart">
+                <i class="fas fa-leaf" style="color:var(--primary-light);"></i>
+                <h3>Your cart is empty</h3>
+                <p>Browse our collection and add some plants!</p>
+                <a href="fruit.html" class="btn btn-primary">Shop Now</a>
+            </div>`;
+        return;
+    }
+
+    document.getElementById('checkout-btn').style.pointerEvents = '';
+    document.getElementById('checkout-btn').style.opacity = '1';
+
+    container.innerHTML = cart.map(item => `
+        <div class="cart-item" id="item-${item.id}">
+            <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='logo.jpg'">
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name} <span class="cart-item-badge">${item.category || 'Plant'}</span></div>
+                <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}
+                    <span style="font-size:0.8rem;color:#999;font-weight:400;"> (₹${item.price} × ${item.qty})</span>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="qty-btn" onclick="changeQty('${item.id}', ${item.qty - 1})">−</button>
+                    <span class="qty-num">${item.qty}</span>
+                    <button class="qty-btn" onclick="changeQty('${item.id}', ${item.qty + 1})">+</button>
+                </div>
+            </div>
+            <button class="remove-btn" onclick="removeItem('${item.id}')" title="Remove"><i class="fas fa-times-circle"></i></button>
+        </div>
+    `).join('');
+}
+
+function changeQty(id, qty) {
+    if (qty < 1) { removeItem(id); return; }
+    Cart.updateQty(id, qty);
+    renderCart();
+    if (window.AmazonStore) AmazonStore.updateHeaderCartCount();
+}
+
+function removeItem(id) {
+    Cart.removeFromCart(id);
+    renderCart();
+    if (window.AmazonStore) AmazonStore.updateHeaderCartCount();
+}
+
+function clearAll() {
+    if (confirm('Remove all items from cart?')) {
+        Cart.clearCart();
+        localStorage.removeItem("sb_active_discount_pct");
+        localStorage.removeItem("sb_active_coupon_code");
+        document.getElementById("coupon-field").value = "";
+        document.getElementById("coupon-message").textContent = "";
+        renderCart();
+    }
+}
+
+renderCart();
+</script>
+
+<script>
+// Hamburger
+document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('active');
+    document.querySelector('.nav-links').classList.toggle('active');
+});
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+</script>
+</body>
+</html>

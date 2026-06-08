@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — Sri Bhaskar Nursery</title>
+
+    <meta name="description" content="Secure checkout for your plant order. Sri Bhaskar Nursery.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://sribhaskarnursery.vercel.app/checkout.html">
+    <link rel="icon" type="image/jpg" href="logo.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f1f3f6; }
+
+        .checkout-header {
+            background: linear-gradient(135deg, #0B5D3B, #3FA34D);
+            color: #fff;
+            padding: 100px 20px 40px;
+            text-align: center;
+        }
+        .checkout-header h1 { font-size: clamp(1.8rem,4vw,2.8rem); margin-bottom: 8px; }
+
+        /* Steps */
+        .checkout-steps {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            background: #fff;
+            border-bottom: 2px solid #eee;
+            padding: 0;
+        }
+        .step {
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
+            padding: 16px 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #aaa;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .step.active { color: #0B5D3B; border-bottom-color: #0B5D3B; }
+        .step .step-num {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: #eee; color: #aaa;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .step.active .step-num { background: #0B5D3B; color: #fff; }
+
+        /* Layout */
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            max-width: 1050px;
+            margin: 30px auto 60px;
+            padding: 0 20px;
+        }
+
+        /* Address Form */
+        .form-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .form-card-header {
+            background: #f9f9f9;
+            padding: 16px 24px;
+            border-bottom: 1px solid #eee;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0B5D3B;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-card-body { padding: 24px; }
+
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.88rem; color: #444; }
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid #ddd; border-radius: 6px;
+            font-family: inherit; font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #3FA34D; outline: none;
+            box-shadow: 0 0 0 3px rgba(63,163,77,0.1);
+        }
+        .input-required { color: #e53935; }
+
+        /* Payment Options */
+        .payment-option {
+            border: 2px solid #eee; border-radius: 8px;
+            padding: 16px 20px; margin-bottom: 12px;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .payment-option:hover { border-color: #3FA34D; background: #f9fff9; }
+        .payment-option.selected { border-color: #0B5D3B; background: #f0f9f4; }
+        .payment-option input[type="radio"] { accent-color: #0B5D3B; width: 18px; height: 18px; }
+        .payment-option .pay-icon { font-size: 1.5rem; color: #0B5D3B; }
+        .payment-option .pay-info strong { display: block; font-size: 0.95rem; }
+        .payment-option .pay-info small { color: #888; font-size: 0.8rem; }
+        .upi-input { margin-top: 12px; display: none; }
+        .upi-input.show { display: block; }
+
+        /* Summary Sidebar */
+        .checkout-summary {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            padding: 24px;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+        .checkout-summary h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .summary-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .summary-item img { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; }
+        .summary-item-info { flex: 1; font-size: 0.85rem; }
+        .summary-item-info strong { display: block; color: #222; }
+        .summary-item-info span { color: #0B5D3B; font-weight: 700; }
+        .summary-divider { border: none; border-top: 1px dashed #eee; margin: 14px 0; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #555; margin-bottom: 8px; }
+        .summary-row.total { font-weight: 800; color: #0B5D3B; font-size: 1.1rem; padding-top: 8px; border-top: 2px solid #eee; }
+
+        .place-order-btn {
+            width: 100%; margin-top: 18px;
+            padding: 15px; font-size: 1rem;
+            background: linear-gradient(135deg, #3FA34D, #0B5D3B);
+            color: #fff; border: none; border-radius: 6px;
+            font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.3s;
+        }
+        .place-order-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11,93,59,0.3); }
+
+        /* Success Overlay */
+        .success-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .success-overlay.show { display: flex; }
+        .success-box {
+            background: #fff; border-radius: 16px;
+            padding: 50px 40px; text-align: center;
+            max-width: 420px; width: 90%;
+            animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .success-icon { font-size: 5rem; color: #3FA34D; margin-bottom: 20px; }
+        .success-box h2 { color: #0B5D3B; margin-bottom: 10px; }
+        .success-box p { color: #666; margin-bottom: 8px; }
+        .order-id-badge {
+            background: #f0f9f4; border: 1.5px dashed #3FA34D;
+            border-radius: 8px; padding: 12px 20px;
+            font-weight: 700; color: #0B5D3B; font-size: 1.1rem;
+            margin: 16px 0;
+        }
+        .success-btns { display: flex; gap: 12px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+        .success-btns a { padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }
+        .success-btns .btn-orders { background: #0B5D3B; color: #fff; }
+        .success-btns .btn-shop { border: 2px solid #0B5D3B; color: #0B5D3B; }
+
+        @media (max-width: 768px) {
+            .checkout-layout { grid-template-columns: 1fr; }
+            .input-row { grid-template-columns: 1fr; }
+            .checkout-summary { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="top-bar">
+    <div class="top-bar-inner">
+        <div class="top-bar-info">
+            <span><i class="fas fa-phone"></i> +91 98855 33297</span>
+            <span><i class="fas fa-map-marker-alt"></i> Kadiyam, Andhra Pradesh</span>
+        </div>
+    </div>
+</div>
+<nav id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">
+            <img src="logo.jpg" alt="Sri Bhaskar Nursery Logo">
+            <div class="logo-text"><span>Sri Bhaskar</span><span>Nursery</span></div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fruit.html">Fruit Plants</a></li>
+            <li><a href="indoor.html">Indoor Plants</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i> My Orders</a></li>
+        </ul>
+        <div style="display:flex;align-items:center;gap:15px;">
+            <a href="cart.html" style="position:relative;font-size:1.5rem;color:var(--primary);">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" style="position:absolute;top:-8px;right:-8px;background:#e53935;color:#fff;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">0</span>
+            </a>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        </div>
+    </div>
+</nav>
+
+<!-- Step Indicator -->
+<div class="checkout-steps">
+    <div class="step"><span class="step-num">1</span> Cart</div>
+    <div class="step active"><span class="step-num">2</span> Address & Payment</div>
+    <div class="step"><span class="step-num">3</span> Confirmation</div>
+</div>
+
+<!-- Page Header -->
+<div class="checkout-header">
+    <h1><i class="fas fa-lock"></i> Secure Checkout</h1>
+    <p>Fill in your delivery address and choose payment method</p>
+</div>
+
+<div class="checkout-layout">
+    <!-- LEFT: Forms -->
+    <div>
+        <!-- Address Form -->
+        <div class="form-card">
+            <div class="form-card-header"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
+            <div class="form-card-body">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Full Name <span class="input-required">*</span></label>
+                        <input type="text" id="name" placeholder="Your full name">
+                    </div>
+                    <div class="input-group">
+                        <label>Mobile Number <span class="input-required">*</span></label>
+                        <input type="tel" id="phone" placeholder="+91 XXXXXXXXXX" maxlength="13">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Address (House No, Street, Area) <span class="input-required">*</span></label>
+                    <input type="text" id="address" placeholder="Enter your full address">
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>City <span class="input-required">*</span></label>
+                        <input type="text" id="city" placeholder="City">
+                    </div>
+                    <div class="input-group">
+                        <label>Pincode <span class="input-required">*</span></label>
+                        <input type="text" id="pincode" placeholder="534XXX" maxlength="6">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>State</label>
+                        <select id="state">
+                            <option>Andhra Pradesh</option>
+                            <option>Telangana</option>
+                            <option>Tamil Nadu</option>
+                            <option>Karnataka</option>
+                            <option>Maharashtra</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Address Type</label>
+                        <select id="addr-type">
+                            <option>Home</option>
+                            <option>Office</option>
+                            <option>Farm / Field</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="form-card">
+            <div class="form-card-header"><i class="fas fa-credit-card"></i> Payment Method</div>
+            <div class="form-card-body">
+                <div class="payment-option selected" onclick="selectPayment(this,'upi')">
+                    <input type="radio" name="payment" value="upi" checked>
+                    <span class="pay-icon"><i class="fas fa-mobile-alt"></i></span>
+                    <div class="pay-info">
+                        <strong>UPI Payment</strong>
+                        <small>Pay using Google Pay, PhonePe, Paytm</small>
+                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" alt="UPI" style="height:24px;margin-left:auto;">
+                </div>
+                <div class="upi-input show" id="upi-input-box">
+                    <input type="text" placeholder="Enter UPI ID (e.g. name@upi)" id="upi-id" style="margin-top:0;">
+                </div>
+
+                <div class="payment-option" onclick="selectPayment(this,'cod')">
+                    <input type="radio" name="payment" value="cod">
+                    <span class="pay-icon"><i class="fas fa-money-bill-wave"></i></span>
+                    <div class="pay-info">
+                        <strong>Cash on Delivery</strong>
+                        <small>Pay when your plants arrive at your door</small>
+                    </div>
+                </div>
+
+                <div class="payment-option" onclick="selectPayment(this,'netbanking')">
+                    <input type="radio" name="payment" value="netbanking">
+                    <span class="pay-icon"><i class="fas fa-university"></i></span>
+                    <div class="pay-info">
+                        <strong>Net Banking</strong>
+                        <small>All major banks supported</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Summary -->
+    <div class="checkout-summary">
+        <h3>Order Summary</h3>
+        <div id="checkout-items"></div>
+        <hr class="summary-divider">
+        <div class="summary-row"><span id="co-count">Items (0)</span><span id="co-subtotal">₹0</span></div>
+        <div class="summary-row" id="co-discount-row" style="display:none; color:#b12704; font-weight:600;"><span>Promo Discount</span><span id="co-discount">-₹0</span></div>
+        <div class="summary-row"><span>Delivery</span><span id="co-delivery" style="color:#3FA34D;font-weight:600;">FREE</span></div>
+        <div class="summary-row total"><span>Total</span><span id="co-total">₹0</span></div>
+        <button class="place-order-btn" onclick="placeOrder()">
+            <i class="fas fa-check-circle"></i> Place Order
+        </button>
+        <div style="text-align:center;margin-top:12px;font-size:0.78rem;color:#aaa;">
+            <i class="fas fa-shield-alt" style="color:#3FA34D;"></i> 100% Secure | Trusted Nursery Since 2005
+        </div>
+    </div>
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="success-overlay">
+    <div class="success-box">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h2>Order Placed! 🌿</h2>
+        <p>Your plants are on their way to you!</p>
+        <div class="order-id-badge" id="placed-order-id">Order ID: —</div>
+        <p style="font-size:0.85rem;color:#888;">Estimated delivery: <strong>3–5 working days</strong></p>
+        <div class="success-btns">
+            <a href="orders.html" class="btn-orders">Track Order</a>
+            <a href="fruit.html" class="btn-shop">Shop More</a>
+        </div>
+    </div>
+</div>
+
+<script src="cart.js"></script>
+<script src="amazon-store.js"></script>
+<script>
+let selectedPayment = 'upi';
+
+function selectPayment(el, method) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+    selectedPayment = method;
+    document.getElementById('upi-input-box').classList.toggle('show', method === 'upi');
+}
+
+function renderSummary() {
+    const cart = Cart.getCart();
+    const total = Cart.getTotal();
+    const delivery = total > 499 ? 0 : 49;
+    
+    // Load promo discounts from localstorage
+    const discountPct = parseFloat(localStorage.getItem("sb_active_discount_pct") || "0");
+    const discountAmt = Math.round(total * discountPct);
+    const finalTotal = Math.max(0, total - discountAmt + delivery);
+
+    document.getElementById('co-count').textContent = `Items (${cart.length})`;
+    document.getElementById('co-subtotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+    
+    const discRow = document.getElementById("co-discount-row");
+    if (discountPct > 0) {
+        discRow.style.display = "flex";
+        document.getElementById("co-discount").textContent = `-₹${discountAmt.toLocaleString('en-IN')}`;
+    } else {
+        discRow.style.display = "none";
+    }
+
+    document.getElementById('co-delivery').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
+    document.getElementById('co-total').textContent = `₹${finalTotal.toLocaleString('en-IN')}`;
+    
+    document.getElementById('checkout-items').innerHTML = cart.map(i => `
+        <div class="summary-item">
+            <img src="${i.img}" alt="${i.name}" onerror="this.src='logo.jpg'">
+            <div class="summary-item-info">
+                <strong>${i.name}</strong>
+                <span>₹${i.price} × ${i.qty}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function placeOrder() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const pincode = document.getElementById('pincode').value.trim();
+
+    if (!name || !phone || !address || !city || !pincode) {
+        alert('Please fill in all required fields (marked with *)');
+        return;
+    }
+    if (!/^\d{6}$/.test(pincode)) { alert('Please enter a valid 6-digit pincode'); return; }
+    if (Cart.getCart().length === 0) { alert('Your cart is empty!'); return; }
+
+    const orderId = Cart.placeOrder({
+        address: { name, phone, address, city, pincode, state: document.getElementById('state').value, type: document.getElementById('addr-type').value },
+        payment: selectedPayment
+    });
+
+    // Patch the placed order with coupon details and actual total
+    const orders = JSON.parse(localStorage.getItem('sb_orders') || '[]');
+    if (orders.length > 0 && orders[0].id === orderId) {
+        const discountPct = parseFloat(localStorage.getItem("sb_active_discount_pct") || "0");
+        const couponCode = localStorage.getItem("sb_active_coupon_code") || "";
+        const delivery = orders[0].total > 499 ? 0 : 49;
+        const discountAmt = Math.round(orders[0].total * discountPct);
+        
+        orders[0].discountPct = discountPct;
+        orders[0].couponCode = couponCode;
+        orders[0].discountAmt = discountAmt;
+        orders[0].delivery = delivery;
+        orders[0].grandTotal = orders[0].total - discountAmt + delivery;
+        localStorage.setItem('sb_orders', JSON.stringify(orders));
+    }
+    
+    // Clear discount local storage
+    localStorage.removeItem("sb_active_discount_pct");
+    localStorage.removeItem("sb_active_coupon_code");
+
+    document.getElementById('placed-order-id').textContent = `Order ID: ${orderId}`;
+    document.getElementById('success-overlay').classList.add('show');
+}
+
+renderSummary();
+</script>
+</body>
+</html>
